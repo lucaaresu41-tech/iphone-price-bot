@@ -1,0 +1,17 @@
+{
+  "timezone": "Europe/Rome",
+  "target_price": null,
+  "notify_on_any_drop": true,
+  "notify_on_rise": false,
+  "daily_summary_hour": 9,
+  "products": [
+    {
+      "name": "iPhone 17 Pro 256 GB Arancione cosmico (venduto da Amazon/Apple)",
+      "asin": "B0FQFQ7544"
+    },
+    {
+      "name": "iPhone 17 Pro 256GB cosmic orange (altri venditori)",
+      "asin": "B0FQGG53WL"
+    }
+  ]
+}
