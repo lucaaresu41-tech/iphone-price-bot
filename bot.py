@@ -263,7 +263,10 @@ def status_text(state: dict, header: str) -> str:
         url = f"https://www.amazon.it/dp/{p['asin']}"
         cur = s.get("last_price") if s.get("available") else None
         lines.append(f"\n<b>{p['name']}</b>")
-        lines.append(f"Ora: <b>{eur(cur)}</b>" + ("" if s.get("available") else " (non disponibile)"))
+        if s.get("available") is None:
+            lines.append("Ora: in attesa del primo controllo riuscito")
+        else:
+            lines.append(f"Ora: <b>{eur(cur)}</b>" + ("" if s.get("available") else " (non disponibile)"))
         if s.get("min_price"):
             lines.append(f"Minimo storico: {eur(s['min_price'])} ({s.get('min_date', '')[:10]})")
         if s.get("max_price"):
