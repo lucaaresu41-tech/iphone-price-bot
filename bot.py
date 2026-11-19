@@ -156,6 +156,10 @@ def extract(html: str, asin: str) -> dict:
 
     landed = soup.select_one("input#ASIN")
     landed_asin = landed.get("value") if landed else asin
+    # Solo prodotto nuovo: esclude schede di ricondizionati / usato
+    if re.search(r"ricondizionat|usato|renewed|refurbished", title, re.I):
+        return {"available": False, "price": None, "title": title, "note": "scheda non di un prodotto nuovo"}
+
     # Se la variante richiesta non è in vendita, Amazon apre un'altra variante (es. 1 TB):
     if landed_asin and landed_asin != asin:
         return {"available": False, "price": None, "title": title,
@@ -326,7 +330,9 @@ def main():
         # storico: si salva un punto solo quando qualcosa cambia
         if first_run or price != prev_price or info["available"] != prev_avail:
             s["history"].append({"t": ts, "price": price})
-        s["last_check"] = ts
+        # data dell'ultimo controllo salvata solo una volta al giorno: evita un commit ogni 5 minuti
+        # ma tiene "vivo" il repository (GitHub sospende i workflow dopo 60 giorni senza attività)
+        s["last_check"] = ts[:10]
         s["available"] = info["available"]
         if price is not None:
             s["last_price"] = price
@@ -356,8 +362,9 @@ def main():
                 extra = "\n🏆 <b>Nuovo minimo storico!</b>" if old_min is None or price < old_min else ""
                 send(f"📉 <b>Prezzo sceso!</b>\n{name}\n{eur(prev_price)} → <b>{eur(price)}</b> "
                      f"({diff:+.2f} €, {pct:+.1f}%)" + extra + link)
-            elif diff > 0 and CONFIG.get("notify_on_rise", False):
-                send(f"📈 Prezzo salito\n{name}\n{eur(prev_price)} → <b>{eur(price)}</b> ({pct:+.1f}%)" + link)
+            elif diff > 0 and CONFIG.get("notify_on_rise", True):
+                send(f"📈 <b>Prezzo salito</b>\n{name}\n{eur(prev_price)} → <b>{eur(price)}</b> "
+                     f"({diff:+.2f} €, {pct:+.1f}%)" + link)
 
         # soglia: avvisa quando si scende sotto (una volta, finché non torna sopra)
         if TARGET_PRICE and price is not None:
@@ -377,7 +384,7 @@ def main():
         meta["block_notified"] = False
     else:
         meta["consecutive_fail"] = meta.get("consecutive_fail", 0) + 1
-        if meta["consecutive_fail"] >= 6 and not meta.get("block_notified"):
+        if meta["consecutive_fail"] >= 36 and not meta.get("block_notified"):
             send("⚠️ Da alcune ore Amazon non risponde ai controlli automatici"
                  + (" (pagina anti-bot)" if blocked else "") + ". Continuo a riprovare.")
             meta["block_notified"] = True

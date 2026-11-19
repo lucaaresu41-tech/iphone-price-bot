@@ -1,7 +1,8 @@
 # 📱 Bot Telegram – prezzo iPhone 17 Pro 256 GB Arancione (Amazon.it)
 
-Controlla Amazon.it **ogni ora** e ti scrive su Telegram quando:
+Controlla Amazon.it **ogni 5 minuti** (il minimo di GitHub; a volte qualche minuto di ritardo) e ti scrive su Telegram **ogni volta che il prezzo cambia**:
 - 📉 il prezzo **scende** (con 🏆 se è il nuovo minimo storico)
+- 📈 il prezzo **sale**
 - ✅ il prodotto **torna disponibile** / ⚠️ non è più disponibile
 - 🎯 il prezzo va **sotto la tua soglia** (opzionale)
 - ☀️ ogni mattina alle 9: **riepilogo con grafico** dell'andamento
@@ -11,8 +12,7 @@ Gira **gratis su GitHub Actions**: funziona anche con il PC spento.
 Prodotti monitorati (modificabili in `config.json`):
 | ASIN | Cosa è |
 |---|---|
-| `B0FQFQ7544` | iPhone 17 Pro 256 GB Arancione cosmico, scheda ufficiale (venduto da Amazon) |
-| `B0FQGG53WL` | iPhone 17 Pro 256GB cosmic orange, scheda di altri venditori |
+| `B0FQFQ7544` | iPhone 17 Pro 256 GB Arancione cosmico, **nuovo** (scheda ufficiale Apple su Amazon) |
 
 ---
 
@@ -52,24 +52,24 @@ Nel repository: **Settings → Secrets and variables → Actions**
 
 ### 5. Avvia
 **Actions** → abilita i workflow se richiesto → **Monitor prezzo iPhone** → **Run workflow**.
-Entro un minuto ricevi su Telegram "🤖 Monitoraggio avviato!". Da lì in poi parte da solo ogni ora.
+Entro un minuto ricevi su Telegram "🤖 Monitoraggio avviato!". Da lì in poi parte da solo ogni 5 minuti.
 
 ---
 
 ## Comandi Telegram
 Scrivi al bot `/prezzo` (stato attuale) o `/grafico` (andamento).
-⚠️ Il bot non è sempre acceso, quindi risponde al **controllo successivo**, cioè entro un'ora.
+⚠️ Il bot non è sempre acceso, quindi risponde al **controllo successivo**, cioè entro pochi minuti.
 Per una risposta immediata: Actions → Run workflow.
 
 ## Personalizzazioni (`config.json`)
 - `daily_summary_hour`: ora del riepilogo (`null` = disattivato)
-- `notify_on_rise`: `true` per essere avvisato anche dei rincari
+- `notify_on_rise`: `false` se non vuoi gli avvisi quando il prezzo sale
 - `products`: aggiungi altri ASIN (il codice dopo `/dp/` nel link Amazon)
-- Frequenza: in `.github/workflows/monitor.yml`, ad esempio `"7,37 * * * *"` = ogni 30 minuti
+- Frequenza: in `.github/workflows/monitor.yml`, ad esempio `"*/15 * * * *"` = ogni 15 minuti
 
 ## Note
-- Se Amazon mostra una pagina anti-bot, il controllo viene **saltato** e si riprova all'ora successiva.
-  Se succede per 6 ore di fila ricevi un avviso.
+- Se Amazon mostra una pagina anti-bot, il controllo viene **saltato** e si riprova al giro successivo.
+  Se succede per 3 ore di fila ricevi un avviso.
 - GitHub sospende i workflow programmati dopo **60 giorni senza attività nel repository**. Il bot salva un commit
-  a ogni controllo, quindi resta attivo da solo. Se si ferma, basta premere "Enable workflow" in Actions.
+  almeno una volta al giorno, quindi resta attivo da solo. Se si ferma, basta premere "Enable workflow" in Actions.
 - Lo storico prezzi è in `data/prices.json`.

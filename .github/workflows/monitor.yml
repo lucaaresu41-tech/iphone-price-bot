@@ -2,7 +2,7 @@ name: Monitor prezzo iPhone
 
 on:
   schedule:
-    - cron: "7 * * * *"   # ogni ora (al minuto 7). GitHub può ritardare di qualche minuto.
+    - cron: "*/5 * * * *"   # ogni 5 minuti (minimo consentito da GitHub; a volte ritarda di qualche minuto)
   workflow_dispatch:       # permette di avviarlo a mano dalla scheda "Actions"
     inputs:
       force_summary:
